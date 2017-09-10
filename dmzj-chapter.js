@@ -2,7 +2,7 @@
 // @name         DMZJ Chapter
 // @namespace    http://manhua.dmzj.com/
 // @version      0.1
-// @description  获取动漫之家被屏蔽的漫画章节，需配合另一个脚本“DMZJ Comic”使用
+// @description  获取动漫之家被屏蔽的漫画章节，需配合另一个脚本[DMZJ Comic]使用
 // @author       rainame
 // @match        http://manhua.dmzj.com/*/*.shtml?cid=*
 // @grant        GM_xmlhttpRequest
