@@ -17,11 +17,11 @@
 
     if ((/^\/[a-z]+\/*$/).test(location.pathname)) {
 
-        if (!g_comic_id) { return; }
+        if (!unsafeWindow.g_comic_id) { return; }
 
         if ($('img[src="/css/img/4004.gif"]').length === 0) {
             $('div.cartoon_online_border li a').each(function() {
-                this.href += ('?cid=' + g_comic_id);
+                this.href += ('?cid=' + unsafeWindow.g_comic_id);
             });
             return;
         }
@@ -33,7 +33,7 @@
 
         GM_xmlhttpRequest({
             method: 'GET',
-            url: 'http://v2.api.dmzj.com/comic/' + g_comic_id + '.json?channel=Android&version=2.6.004',
+            url: 'http://v2.api.dmzj.com/comic/' + unsafeWindow.g_comic_id + '.json?channel=Android&version=2.6.004',
             onload: function(res) {
 
                 if (res.status !== 200) { return; }
@@ -45,7 +45,7 @@
                 let list = data.chapters[0].data.reverse(), ary = [], chapter;
                 for (let i = 0; i < list.length; i++) {
                     chapter = list[i];
-                    ary.push('<li><a title="' + g_comic_name + '-第' + chapter.chapter_title + '" href="/' + g_comic_url + chapter.chapter_id + '.shtml?cid=' + g_comic_id + '"' + ((i === list.length - 1) ? ' class="color_red"' : '') + '>第' + chapter.chapter_title + '</a></li>');
+                    ary.push('<li><a title="' + unsafeWindow.g_comic_name + '-第' + chapter.chapter_title + '" href="/' + unsafeWindow.g_comic_url + chapter.chapter_id + '.shtml?cid=' + unsafeWindow.g_comic_id + '"' + ((i === list.length - 1) ? ' class="color_red"' : '') + '>第' + chapter.chapter_title + '</a></li>');
                 }
 
                 let maxpage = Math.ceil(list.length / pagenum), button = [], border = [];
@@ -74,7 +74,7 @@
         if ($('a.error-btn').length === 0 || !(/\?cid=[\d+]/).test(location.search)) { return; }
 
         $.fancybox.defaults.clickSlide = false;
-        $.fancybox.defaults.margin = 0;
+        //$.fancybox.defaults.margin = 0;
         $.fancybox.defaults.afterClose = function() {
             location.href = location.href.substr(0, location.href.lastIndexOf('/') + 1);
         };
@@ -104,10 +104,11 @@
                 let list = [];
                 for (let i = 0; i < data.page_url.length; i++) {
                     list.push({
-                        src : data.page_url[i]
+                        src : data.page_url[i],
+                        opts: { margin : 0 }
                     });
                 }
-                setTimeout(function(){$.fancybox.open(list);}, 500);
+                setTimeout(function(){$.fancybox.open(list);}, 300);
             }
         });
     }
