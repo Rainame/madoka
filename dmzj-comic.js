@@ -74,7 +74,7 @@
         if ($('a.error-btn').length === 0 || !(/\?cid=[\d+]/).test(location.search)) { return; }
 
         $.fancybox.defaults.clickSlide = false;
-        //$.fancybox.defaults.margin = 0;
+        $.fancybox.defaults.margin = 0;
         $.fancybox.defaults.afterClose = function() {
             location.href = location.href.substr(0, location.href.lastIndexOf('/') + 1);
         };
@@ -104,11 +104,10 @@
                 let list = [];
                 for (let i = 0; i < data.page_url.length; i++) {
                     list.push({
-                        src : data.page_url[i],
-                        opts: { margin : 0 }
+                        src : data.page_url[i]
                     });
                 }
-                setTimeout(function(){$.fancybox.open(list);}, 300);
+                setTimeout(function(){$.fancybox.open(list);}, 500);
             }
         });
     }
