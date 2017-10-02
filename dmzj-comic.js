@@ -20,7 +20,7 @@
         if (!unsafeWindow.g_comic_id) { return; }
 
         if ($('img[src="/css/img/4004.gif"]').length === 0) {
-            $('div.cartoon_online_border li a').each(function() {
+            $('div.cartoon_online_border li a,div.cartoon_online_border_other li a').each(function() {
                 this.href += ('?cid=' + unsafeWindow.g_comic_id);
             });
             return;
@@ -42,30 +42,51 @@
 
                 if (!data || !data.chapters) { return; }
 
-                let list = data.chapters[0].data.reverse(), ary = [], chapter;
-                for (let i = 0; i < list.length; i++) {
-                    chapter = list[i];
-                    ary.push('<li><a title="' + unsafeWindow.g_comic_name + '-第' + chapter.chapter_title + '" href="/' + unsafeWindow.g_comic_url + chapter.chapter_id + '.shtml?cid=' + unsafeWindow.g_comic_id + '"' + ((i === list.length - 1) ? ' class="color_red"' : '') + '>第' + chapter.chapter_title + '</a></li>');
+                let part = [];
+                for (let x = 0; x < data.chapters.length; x++) {
+                    let list = data.chapters[x].data.reverse(), ary = [], chapter, prefix;
+                    for (let i = 0; i < list.length; i++) {
+                        chapter = list[i];
+                        prefix = ((x === 0 && (/^\d/).test(chapter.chapter_title)) ? '第' : '');
+                        ary.push('<li><a title="' + unsafeWindow.g_comic_name + '-' + prefix + chapter.chapter_title + '" href="/' + unsafeWindow.g_comic_url + chapter.chapter_id + '.shtml?cid=' + unsafeWindow.g_comic_id + '"' + ((i === list.length - 1) ? ' class="color_red"' : '') + '>' + prefix + chapter.chapter_title + '</a></li>');
+                    }
+
+                    let border = [];
+                    if (x === 0) {
+                        let h2 = $('div.middleright div.middleright_mr:eq(0) div.photo_part:eq(0) h2:eq(0)');
+                        h2.text(h2.text() + '全集');
+
+                        let maxpage = Math.ceil(list.length / pagenum), button = [];
+                        for (let i = 1; i <= maxpage; i++) {
+                            button.push('<li class="t1 ' + ((i === maxpage) ? 'b1' : 'b2') + '" style="cursor: pointer;">第' + i + '页</li>');
+                            border.push('<div class="cartoon_online_border"' + ((i === maxpage) ? '' : ' style="display:none"') + '><ul>' + ary.splice(0, pagenum).join('') + '</ul><div class="clearfix"></div></div>');
+                        }
+
+                        let JQButton = $('<ul class="cartoon_online_button margin_top_10px">' + button.join('') + '</ul>');
+                        JQButton.children('li').each(function(i) {
+                            $(this).click(function() {
+                                $('.t1').addClass('b2');
+                                $(this).removeClass('b2');
+                                $(this).addClass('b1');
+                                $(".cartoon_online_border").hide();
+                                $(".cartoon_online_border").eq(i).show();
+                            });
+                        });
+
+                        part.unshift(JQButton);
+                    }
+                    else {
+                        let photo_part = '<div class="photo_part" style="margin-top: 20px;"><div class="h2_title2"><span class="h2_icon h2_icon22"></span><h2>' + unsafeWindow.g_comic_name + ' 漫画其它版本：' + data.chapters[x].title + '</h2></div></div>';
+                        border.push('<div class="cartoon_online_border_other" style="border-top: 1px dashed #0187c5;"><ul>' + ary.join('') + '</ul><div class="clearfix"></div></div>');
+                        part.unshift(photo_part);
+                    }
+
+                    part.unshift(border.join(''));
                 }
 
-                let maxpage = Math.ceil(list.length / pagenum), button = [], border = [];
-                for (let i = 1; i <= maxpage; i++) {
-                    button.push('<li class="t1 ' + ((i === maxpage) ? 'b1' : 'b2') + '" style="cursor: pointer;">第' + i + '页</li>');
-                    border.push('<div class="cartoon_online_border"' + ((i === maxpage) ? '' : ' style="display:none"') + '><ul>' + ary.splice(0, pagenum).join('') + '</ul><div class="clearfix"></div></div>');
+                for (let x = 0; x < part.length; x++) {
+                    $('#last_read_history').after(part[x]);
                 }
-
-                let JQButton = $('<ul class="cartoon_online_button margin_top_10px">' + button.join('') + '</ul>');
-                JQButton.children('li').each(function(i) {
-                    $(this).click(function() {
-                        $('.t1').addClass('b2');
-                        $(this).removeClass('b2');
-                        $(this).addClass('b1');
-                        $(".cartoon_online_border").hide();
-                        $(".cartoon_online_border").eq(i).show();
-                    });
-                });
-
-                $('#last_read_history').after(border.join('')).after(JQButton);
             }
         });
     }
@@ -107,6 +128,7 @@
                         src : data.page_url[i]
                     });
                 }
+
                 setTimeout(function(){$.fancybox.open(list);}, 500);
             }
         });
