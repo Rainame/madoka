@@ -4,12 +4,12 @@
 // @version      0.1
 // @description  获取动漫之家被屏蔽的漫画目录及章节
 // @author       rainame
-// @include      /^http://manhua.dmzj.com/[a-z]+/*$/
-// @match        http://manhua.dmzj.com/*/*.shtml?cid=*
+// @match        http://manhua.dmzj.com/*
 // @grant        unsafeWindow
 // @grant        GM_xmlhttpRequest
 // @require      https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js
 // @require      https://cdn.bootcss.com/fancybox/3.1.20/jquery.fancybox.min.js
+// @noframes
 // ==/UserScript==
 
 (function($, unsafeWindow) {
@@ -17,7 +17,7 @@
     'use strict';
 
     if (typeof unsafeWindow.ajax_myScribe_json === 'function') {
-        var getSubscribe = function() {
+        unsafeWindow.ajax_myScribe_json = exportFunction(function() {
             var url = "https://interface.dmzj.com/api/subscribe/getSubscribe";
             unsafeWindow.$.ajax(cloneInto({
                 type: 'get',
@@ -47,9 +47,7 @@
                     unsafeWindow.$("#my_scribe_con").html(html);
                 }
             }, unsafeWindow, {cloneFunctions: true}));
-        };
-
-        unsafeWindow.ajax_myScribe_json = exportFunction(getSubscribe, unsafeWindow);
+        }, unsafeWindow);
     }
 
     if ((/^\/[a-z]+\/*$/).test(location.pathname)) {
@@ -127,7 +125,7 @@
             }
         });
     }
-    else {
+    else if ((/^\/[a-z]+\/\d+\.shtml$/).test(location.pathname)) {
 
         if ($('a.error-btn').length === 0 || !(/\?cid=[\d+]/).test(location.search)) { return; }
 
