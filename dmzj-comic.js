@@ -6,14 +6,51 @@
 // @author       rainame
 // @include      /^http://manhua.dmzj.com/[a-z]+/*$/
 // @match        http://manhua.dmzj.com/*/*.shtml?cid=*
+// @grant        unsafeWindow
 // @grant        GM_xmlhttpRequest
 // @require      https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js
 // @require      https://cdn.bootcss.com/fancybox/3.1.20/jquery.fancybox.min.js
 // ==/UserScript==
 
-(function($) {
+(function($, unsafeWindow) {
 
     'use strict';
+
+    if (typeof unsafeWindow.ajax_myScribe_json === 'function') {
+        var getSubscribe = function() {
+            var url = "https://interface.dmzj.com/api/subscribe/getSubscribe";
+            unsafeWindow.$.ajax(cloneInto({
+                type: 'get',
+                url: url,
+                cache: false,
+                dataType: 'jsonp',
+                data: "type_id=0",
+                timeout: 30000,
+                success: function (res) {
+                    var html = '';
+                    if (!res) {
+                        html = '<div class="no_content">你还没有订阅过作品哦</div>';
+                        unsafeWindow.$("#scribe_more").hide();
+                    }
+                    else {
+                        unsafeWindow.$("#scribe_more").show();
+                        var json = res.slice(0, 8);
+                        for (var i = 0; i < json.length; i++) {
+                            var is_read = json[i].sub_readed === 0 ? '<span class="subcribe_new"></span>' : '';
+                            html += '<li><span class="tip"></span>';
+                            html += '<a class="book_title wid" title="' + json[i].sub_name + '" onclick="mark_read(' + json[i].sub_id + ',' + "'" + json[i].sub_type + "'" + ')" href="' + json[i].sub_id_url + '" target="_blank">' + json[i].sub_name + '</a>';
+                            html += '';
+                            html += '<a class="book_num" title="' + json[i].sub_update + '" onclick="mark_read(' + json[i].sub_id + ',' + "'" + json[i].sub_type + "'" + ')" href="' + json[i].sub_url + '?cid=' + json[i].sub_id + '" target="_blank">' + json[i].sub_update + '</a>';
+                            html += is_read + '</li>';
+                        }
+                    }
+                    unsafeWindow.$("#my_scribe_con").html(html);
+                }
+            }, unsafeWindow, {cloneFunctions: true}));
+        };
+
+        unsafeWindow.ajax_myScribe_json = exportFunction(getSubscribe, unsafeWindow);
+    }
 
     if ((/^\/[a-z]+\/*$/).test(location.pathname)) {
 
@@ -133,4 +170,4 @@
             }
         });
     }
-})($);
+})($, unsafeWindow);
