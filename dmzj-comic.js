@@ -1,10 +1,10 @@
 // ==UserScript==
 // @name         动漫之家助手
-// @namespace    http://manhua.dmzj.com/
+// @namespace    https://manhua.dmzj.com/
 // @version      0.1
 // @description  获取动漫之家被屏蔽的漫画目录及章节
 // @author       rainame
-// @match        http://manhua.dmzj.com/*
+// @match        https://manhua.dmzj.com/*
 // @grant        unsafeWindow
 // @grant        GM_xmlhttpRequest
 // @require      https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js
@@ -131,8 +131,31 @@
 
         $.fancybox.defaults.clickSlide = false;
         $.fancybox.defaults.margin = 0;
+        $.fancybox.defaults.buttons = ['fullScreen', 'close'];
         $.fancybox.defaults.afterClose = function() {
             location.href = location.href.substr(0, location.href.lastIndexOf('/') + 1);
+        };
+        $.fancybox.defaults.beforeLoad = function (instance, slide) {
+            if (slide.type !== 'image' || !slide.opts.realsrc) { return; }
+            GM_xmlhttpRequest({
+                method: 'GET',
+                url: slide.opts.realsrc,
+                headers: {'Referer': 'http://images.dmzj.com/'},
+                responseType: 'blob',
+                onload: function(res) {
+                    if (res.status !== 200) { return; }
+                    slide.src = unsafeWindow.URL.createObjectURL(res.response);
+                    slide.$image.hide('fast', function () {
+                        slide.$slide.empty()
+                        instance.setImage(slide);
+                        $(this).fadeIn();
+                    });
+                }
+            });
+        };
+        $.fancybox.defaults.afterLoad = function(instance, slide) {
+            if (slide.type !== 'image') { return; }
+            unsafeWindow.URL.revokeObjectURL(slide.src);
         };
 
         unsafeWindow.stop();
@@ -160,7 +183,10 @@
                 let list = [];
                 for (let i = 0; i < data.page_url.length; i++) {
                     list.push({
-                        src : data.page_url[i]
+                        src : 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAIGNIUk0AAHolAACAgwAA+f8AAIDpAAB1MAAA6mAAADqYAAAXb5JfxUYAAAATSURBVHjaYvj//z8DAAAA//8DAAj8Av7TpXVhAAAAAElFTkSuQmCC',
+                        opts : {
+                            realsrc : data.page_url[i]
+                        }
                     });
                 }
 
