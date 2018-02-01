@@ -2,7 +2,7 @@
 // @name         动漫之家助手
 // @namespace    https://manhua.dmzj.com/
 // @version      0.1
-// @description  获取动漫之家被屏蔽的漫画目录及章节
+// @description  获取动漫之家被屏蔽的漫画目录及章节，仅支持Tampermonkey
 // @author       rainame
 // @match        https://manhua.dmzj.com/*
 // @grant        unsafeWindow
@@ -15,6 +15,10 @@
 (function($, unsafeWindow) {
 
     'use strict';
+
+    if (!unsafeWindow.URL || !unsafeWindow.URL.createObjectURL || !unsafeWindow.URL.revokeObjectURL) {
+        return;
+    }
 
     if (typeof unsafeWindow.ajax_myScribe_json === 'function') {
         unsafeWindow.ajax_myScribe_json = exportFunction(function() {
