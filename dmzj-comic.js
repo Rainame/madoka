@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         动漫之家助手
 // @namespace    https://manhua.dmzj.com/
-// @version      0.1
+// @version      0.11
 // @description  获取动漫之家被屏蔽的漫画目录及章节，脚本于Tampermonkey中测试通过。
 // @author       rainame
 // @match        https://manhua.dmzj.com/*
@@ -12,18 +12,18 @@
 // @noframes
 // ==/UserScript==
 
-(function($, unsafeWindow) {
+(function(window, $) {
 
     'use strict';
 
-    if (!unsafeWindow.URL || !unsafeWindow.URL.createObjectURL || !unsafeWindow.URL.revokeObjectURL) {
+    if (!window.URL || !window.URL.createObjectURL || !window.URL.revokeObjectURL) {
         return;
     }
 
-    if (typeof unsafeWindow.ajax_myScribe_json === 'function') {
-        unsafeWindow.ajax_myScribe_json = exportFunction(function() {
+    if (typeof window.ajax_myScribe_json === 'function') {
+        window.ajax_myScribe_json = function() {
             var url = "https://interface.dmzj.com/api/subscribe/getSubscribe";
-            unsafeWindow.$.ajax(cloneInto({
+            window.$.ajax({
                 type: 'get',
                 url: url,
                 cache: false,
@@ -34,33 +34,33 @@
                     var html = '';
                     if (!res) {
                         html = '<div class="no_content">你还没有订阅过作品哦</div>';
-                        unsafeWindow.$("#scribe_more").hide();
+                        window.$("#scribe_more").hide();
                     }
                     else {
-                        unsafeWindow.$("#scribe_more").show();
+                        window.$("#scribe_more").show();
                         var json = res.slice(0, 8);
                         for (var i = 0; i < json.length; i++) {
                             var is_read = json[i].sub_readed === 0 ? '<span class="subcribe_new"></span>' : '';
                             html += '<li><span class="tip"></span>';
-                            html += '<a class="book_title wid" title="' + json[i].sub_name + '" onclick="mark_read(' + json[i].sub_id + ',' + "'" + json[i].sub_type + "'" + ')" href="' + json[i].sub_id_url + '" target="_blank">' + json[i].sub_name + '</a>';
+                            html += '<a class="book_title wid" title="' + json[i].sub_name + '" onclick="mark_read(' + json[i].sub_id + ",'" + json[i].sub_type + '\')" href="' + json[i].sub_id_url + '" target="_blank">' + json[i].sub_name + '</a>';
                             html += '';
-                            html += '<a class="book_num" title="' + json[i].sub_update + '" onclick="mark_read(' + json[i].sub_id + ',' + "'" + json[i].sub_type + "'" + ')" href="' + json[i].sub_url + '?cid=' + json[i].sub_id + '" target="_blank">' + json[i].sub_update + '</a>';
+                            html += '<a class="book_num" title="' + json[i].sub_update + '" onclick="mark_read(' + json[i].sub_id + ",'" + json[i].sub_type + '\')" href="' + json[i].sub_url + '?cid=' + json[i].sub_id + '" target="_blank">' + json[i].sub_update + '</a>';
                             html += is_read + '</li>';
                         }
                     }
-                    unsafeWindow.$("#my_scribe_con").html(html);
+                    window.$("#my_scribe_con").html(html);
                 }
-            }, unsafeWindow, {cloneFunctions: true}));
-        }, unsafeWindow);
+            });
+        };
     }
 
     if ((/^\/[a-z]+\/*$/).test(location.pathname)) {
 
-        if (!unsafeWindow.g_comic_id) { return; }
+        if (!window.g_comic_id) { return; }
 
         if ($('img[src="/css/img/4004.gif"]').length === 0) {
             $('div.cartoon_online_border li a,div.cartoon_online_border_other li a').each(function() {
-                this.href += ('?cid=' + unsafeWindow.g_comic_id);
+                this.href += ('?cid=' + window.g_comic_id);
             });
             return;
         }
@@ -72,7 +72,7 @@
 
         GM_xmlhttpRequest({
             method: 'GET',
-            url: 'http://v2.api.dmzj.com/comic/' + unsafeWindow.g_comic_id + '.json?channel=Android&version=2.6.004',
+            url: 'http://v2.api.dmzj.com/comic/' + window.g_comic_id + '.json?channel=Android&version=2.6.004',
             onload: function(res) {
 
                 if (res.status !== 200) { return; }
@@ -87,7 +87,7 @@
                     for (let i = 0; i < list.length; i++) {
                         chapter = list[i];
                         prefix = ((x === 0 && (/^\d/).test(chapter.chapter_title)) ? '第' : '');
-                        ary.push('<li><a title="' + unsafeWindow.g_comic_name + '-' + prefix + chapter.chapter_title + '" href="/' + unsafeWindow.g_comic_url + chapter.chapter_id + '.shtml?cid=' + unsafeWindow.g_comic_id + '"' + ((i === list.length - 1) ? ' class="color_red"' : '') + '>' + prefix + chapter.chapter_title + '</a></li>');
+                        ary.push('<li><a title="' + window.g_comic_name + '-' + prefix + chapter.chapter_title + '" href="/' + window.g_comic_url + chapter.chapter_id + '.shtml?cid=' + window.g_comic_id + '"' + ((i === list.length - 1) ? ' class="color_red"' : '') + '>' + prefix + chapter.chapter_title + '</a></li>');
                     }
 
                     let border = [];
@@ -115,7 +115,7 @@
                         part.unshift(JQButton);
                     }
                     else {
-                        let photo_part = '<div class="photo_part" style="margin-top: 20px;"><div class="h2_title2"><span class="h2_icon h2_icon22"></span><h2>' + unsafeWindow.g_comic_name + ' 漫画其它版本：' + data.chapters[x].title + '</h2></div></div>';
+                        let photo_part = '<div class="photo_part" style="margin-top: 20px;"><div class="h2_title2"><span class="h2_icon h2_icon22"></span><h2>' + window.g_comic_name + ' 漫画其它版本：' + data.chapters[x].title + '</h2></div></div>';
                         border.push('<div class="cartoon_online_border_other" style="border-top: 1px dashed #0187c5;"><ul>' + ary.join('') + '</ul><div class="clearfix"></div></div>');
                         part.unshift(photo_part);
                     }
@@ -135,7 +135,18 @@
 
         $.fancybox.defaults.clickSlide = false;
         $.fancybox.defaults.margin = 0;
-        $.fancybox.defaults.buttons = ['fullScreen', 'close'];
+        $.fancybox.defaults.buttons = ['thumbs', 'fullScreen', 'close'];
+        $.fancybox.defaults.i18n.cn = {
+            CLOSE       : '关闭',
+            NEXT        : '下一页',
+            PREV        : '上一页',
+            ERROR       : '请求内容无法加载，请稍后重试',
+            PLAY_START  : '开启幻灯片',
+            PLAY_STOP   : '关闭幻灯片',
+            FULL_SCREEN : '全屏',
+            THUMBS      : '缩略图'
+        };
+        $.fancybox.defaults.lang = 'cn';
         $.fancybox.defaults.afterClose = function() {
             location.href = location.href.substr(0, location.href.lastIndexOf('/') + 1);
         };
@@ -148,9 +159,9 @@
                 responseType: 'blob',
                 onload: function(res) {
                     if (res.status !== 200) { return; }
-                    slide.src = unsafeWindow.URL.createObjectURL(res.response);
+                    slide.src = window.URL.createObjectURL(res.response);
                     slide.$image.hide('fast', function () {
-                        slide.$slide.empty()
+                        slide.$slide.empty();
                         instance.setImage(slide);
                         $(this).fadeIn();
                     });
@@ -159,10 +170,10 @@
         };
         $.fancybox.defaults.afterLoad = function(instance, slide) {
             if (slide.type !== 'image') { return; }
-            unsafeWindow.URL.revokeObjectURL(slide.src);
+            window.URL.revokeObjectURL(slide.src);
         };
 
-        unsafeWindow.stop();
+        window.stop();
 
         $('head meta[http-equiv="refresh"]').remove();
         $('head style').remove();
@@ -194,8 +205,28 @@
                     });
                 }
 
-                setTimeout(function(){$.fancybox.open(list);}, 500);
+                setTimeout(function(){
+                    var fbox = $.fancybox.open(list);
+                    var FancyThumbs = Object.getPrototypeOf(fbox.Thumbs);
+                    FancyThumbs.create = function() {
+                        var that = this, instance = that.instance, list;
+
+                        this.$grid = $('<div class="fancybox-thumbs" style="width:110px;"></div>').appendTo(instance.$refs.container);
+
+                        list = '<ul style="font-size:16px;">';
+
+                        $.each(instance.group, function(i) {
+                            list += '<li data-index="' + i + '"  tabindex="0" style="float:none;max-width:none;width:auto;text-align:center;height:45px;line-height:40px;">第' + (i + 1) + '页</li>';
+                        });
+
+                        list += '</ul>';
+
+                        this.$list = $(list).appendTo( this.$grid ).on('click', 'li', function() {
+                            instance.jumpTo($(this).data('index'));
+                        });
+                    };
+                }, 500);
             }
         });
     }
-})($, unsafeWindow);
+})(window.unsafeWindow, window.$);
