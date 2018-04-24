@@ -1,14 +1,16 @@
 // ==UserScript==
-// @name         动漫之家助手
-// @namespace    https://manhua.dmzj.com/
-// @version      0.12
-// @description  获取动漫之家被屏蔽的漫画目录及章节，脚本于Tampermonkey中测试通过。
-// @author       rainame
-// @license      MIT
-// @match        https://manhua.dmzj.com/*
-// @grant        GM_xmlhttpRequest
-// @require      https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js
-// @require      https://cdn.bootcss.com/fancybox/3.1.20/jquery.fancybox.min.js
+// @name        动漫之家助手
+// @namespace   https://manhua.dmzj.com/
+// @version     0.2
+// @description 获取动漫之家被屏蔽的漫画目录及章节，脚本于Tampermonkey中测试通过。
+// @author      rainame
+// @license     MIT
+// @copyright   2018, rainame
+// @homepageURL https://manhua.dmzj.com/
+// @match       https://manhua.dmzj.com/*
+// @grant       GM_xmlhttpRequest
+// @require     https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js
+// @require     https://cdn.bootcss.com/fancybox/3.1.20/jquery.fancybox.min.js
 // @noframes
 // ==/UserScript==
 
