@@ -412,6 +412,8 @@
         };
     }
 
+    var params = '?channel=Android&version=2.6.004';
+
     if ((/^\/[a-z]+\/*$/).test(window.location.pathname)) {
 
         if (!window.g_comic_id) { return; }
@@ -430,7 +432,7 @@
 
         GM_xmlhttpRequest({
             method: 'GET',
-            url: 'http://v2.api.dmzj.com/comic/' + window.g_comic_id + '.json?channel=Android&version=2.6.004',
+            url: 'http://v2.api.dmzj.com/comic/' + window.g_comic_id + '.json' + params,
             onload: function(res) {
 
                 if (res.status !== 200) { return; }
@@ -524,7 +526,7 @@
 
         GM_xmlhttpRequest({
             method: 'GET',
-            url: 'http://v2.api.dmzj.com/comic/' + option.comic_id + '.json?channel=Android&version=2.6.004',
+            url: 'http://v2.api.dmzj.com/comic/' + option.comic_id + '.json' + params,
             onload: function(res) {
 
                 if (res.status !== 200) { return; }
@@ -568,7 +570,7 @@
 
         GM_xmlhttpRequest({
             method: 'GET',
-            url: 'http://v2.api.dmzj.com/chapter/' + option.comic_id + '/' + option.chapter_id + '.json?channel=Android&version=2.6.004',
+            url: 'http://v2.api.dmzj.com/chapter/' + option.comic_id + '/' + option.chapter_id + '.json' + params,
             onload: function(res) {
 
                 if (res.status !== 200) { return; }
