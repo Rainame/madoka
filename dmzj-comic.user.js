@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        动漫之家助手
 // @namespace   https://manhua.dmzj.com/
-// @version     2.0.0
+// @version     2.0.1
 // @description 获取动漫之家被屏蔽的漫画目录及章节，脚本于Tampermonkey中测试通过。
 // @author      rainame
 // @license     MIT
