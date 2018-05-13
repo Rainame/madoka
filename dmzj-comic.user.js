@@ -5,7 +5,7 @@
 // @description 获取动漫之家被屏蔽的漫画目录及章节，脚本于Tampermonkey中测试通过。
 // @author      rainame
 // @license     MIT
-// @match       https://manhua.dmzj.com/*
+// @match       http*://manhua.dmzj.com/*
 // @grant       GM_xmlhttpRequest
 // @require     https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js
 // @require     https://cdn.bootcss.com/jquery-cookie/1.4.1/jquery.cookie.min.js
@@ -14,13 +14,13 @@
 // @noframes
 // ==/UserScript==
 
-window.unsafeWindow.$ = window.unsafeWindow.jQuery = window.$;
 
-(function(window) {
+
+(function(window, $) {
 
     'use strict';
 
-    var $ = window.$;
+    if (!window.$) { window.$ = $; }
 
     window.page = {
         pages: [],
@@ -372,13 +372,11 @@ window.unsafeWindow.$ = window.unsafeWindow.jQuery = window.$;
             });
         }
     };
-})(window.unsafeWindow);
+})(window.unsafeWindow, window.$);
 
-(function(window) {
+(function(window, $) {
 
     'use strict';
-
-    var $ = window.$;
 
     if (typeof window.ajax_myScribe_json === 'function') {
         window.ajax_myScribe_json = function() {
@@ -491,7 +489,9 @@ window.unsafeWindow.$ = window.unsafeWindow.jQuery = window.$;
     }
     else if ((/^\/[a-z]+\/\d+\.shtml$/).test(window.location.pathname)) {
 
-        if ($('a.error-btn').length === 0 || !(/\?cid=[\d+]/).test(window.location.search)) {
+        if (!(/\?cid=[\d+]/).test(window.location.search)) { return; }
+
+        if ($('a.error-btn').length === 0) {
             let comic_id = window.location.search.match(/\d+/)[0],
                 $prev = $('#prev_chapter'), $next = $('#next_chapter');
             if ($prev.length > 0) {
@@ -593,4 +593,4 @@ window.unsafeWindow.$ = window.unsafeWindow.jQuery = window.$;
             }
         });
     }
-})(window.unsafeWindow);
+})(window.unsafeWindow, window.$);
